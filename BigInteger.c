@@ -50,6 +50,10 @@ static int max(int a, int b) {
 	return a >= b ? a : b;
 }
 
+static int min(int a, int b) {
+	return a <= b ? a : b;
+}
+
 // Add a digit
 static void addDigitRight(BigInteger number, int digit) {
 	
@@ -95,6 +99,20 @@ static void addDigitLeft(BigInteger number, int digit) {
 	
 	number -> digit++;
 	
+}
+
+// Free
+static void freeAll(BigInteger number) {
+	if (number == NULL || number -> digit == 0) {
+		return;
+	}
+	
+	Digit curr = NULL;
+	Digit next;
+	for (curr = number -> first; curr -> next != NULL; curr = next) {
+		next = curr -> next;
+		free(curr);
+	}
 }
 
 // Create an empty Integer
@@ -225,6 +243,9 @@ BigInteger add(BigInteger one, BigInteger two) {
 			addDigitLeft(new, 1);
 		}
 		
+		freeAll(one);
+		freeAll(two);
+		
 		return new;
 		
 	}
@@ -249,7 +270,71 @@ BigInteger multiply(BigInteger one, BigInteger two) {
 		printf("multiply: Number is not valid.\n");
 		exit(1);
 	}
-	return emptyInteger(NEGATIVE);
+	
+	int i;
+	
+	// -1 * 1 = -1, 1 * -1 = -1, 1 * 1= 1, -1 * -1 = 1 
+	BigInteger new = newInteger("0", POSITIVE);
+	// Use the smallest value
+	int calCount = min(one -> digit, two -> digit);
+	
+	BigInteger small, big;
+	if (one -> digit == calCount) {
+		small = one;
+		big = two;
+	} else {
+		small = two;
+		big = one;
+	}
+	
+	BigInteger temp;
+	Digit smallCurr = small -> last;
+	Digit bigCurr;
+	for (i = 0; i < calCount; i++) {
+		temp = emptyInteger(POSITIVE);
+		// Reset to last
+		int numToCarry = 0;
+		for (bigCurr = big -> last; bigCurr != NULL; bigCurr = bigCurr -> prev) {
+			// Calculate
+			int numToAdd = bigCurr -> number * smallCurr -> number;
+			
+			if (numToAdd >= 10) {
+				numToCarry = numToAdd / 10;
+				numToAdd -= numToCarry * 10;
+				bigCurr -> carry = numToCarry;
+			}
+			// Check if there is carry
+			if (bigCurr -> next != NULL && bigCurr -> next -> carry > 0) {
+				numToAdd += bigCurr -> next -> carry;
+				bigCurr -> next -> carry = 0;
+				if (numToAdd >= 10) {
+					numToCarry = numToAdd / 10;
+					numToAdd -= numToCarry * 10;
+					bigCurr -> carry = numToCarry;
+					numToCarry = 0;
+				}
+			}
+			addDigitLeft(temp, numToAdd);
+		}
+		
+		if (big -> first -> carry > 0) {
+			addDigitLeft(temp, big -> first -> carry);
+		}
+		
+		int k;
+		for (k = 0; k < i; k++) {
+			// Shift
+			addDigitRight(temp, 0);
+		}
+		
+		// Add
+		new = add(new, temp);
+		smallCurr = smallCurr -> prev;
+	}
+	
+	new -> sign = (one -> sign == two -> sign ? POSITIVE : NEGATIVE);
+	return new;
+	
 }
 
 // Divide two integers
@@ -272,3 +357,19 @@ BigInteger modulus(BigInteger one, BigInteger two) {
 	return emptyInteger(NEGATIVE);
 }
 
+// Calculate the sum of digits
+void calSumOfDigit(BigInteger number) {
+	
+	if (number == NULL) {
+		printf("printInteger: number is not valid.\n");
+		return;
+	}
+	
+	Digit curr;
+	int sum = 0;
+	for (curr = number -> first; curr != NULL; curr = curr -> next) {
+		sum += curr -> number;
+	}
+	printf("Sum of digits are %d (%d)\n", sum, number -> digit);
+	
+}

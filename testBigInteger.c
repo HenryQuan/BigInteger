@@ -10,11 +10,14 @@ void testBigInteger();
 void testPrint();
 void testAdd();
 void Q13();
+void Q16();
+void testMultiply();
 
 int main(int argc, char *argv[]) {
 	
 	testBigInteger();
-	Q13();
+	//Q13();
+	Q16();
 	return 0;
 	
 }
@@ -34,9 +37,23 @@ void Q13() {
 	fclose(fp);
 }
 
+void Q16() {
+	printf("Testing Q16\n");
+	BigInteger result = newInteger("1", POSITIVE);
+	int i;
+	for (i = 0; i < 1000; i++) {
+		BigInteger temp = newInteger("2", POSITIVE);
+		result = multiply(temp, result);
+	}
+	printf("2^1000 = ");
+	printInteger(result);
+	calSumOfDigit(result);
+}
+
 void testBigInteger() {
-	testPrint();
-	testAdd();
+	//testPrint();
+	//testAdd();
+	testMultiply();
 }
 
 void testPrint() {
@@ -59,4 +76,12 @@ void testAdd() {
 	BigInteger two2 = newInteger("4897456148674865146857", NEGATIVE);
 	BigInteger three2 = add(one2, two2);
 	printInteger(three2);
+}
+
+void testMultiply() {
+	printf("Testing Multiply\n");
+	BigInteger one = newInteger("3254132", NEGATIVE);
+	BigInteger two = newInteger("1231241", NEGATIVE);
+	BigInteger three = multiply(one, two);
+	printInteger(three);
 }

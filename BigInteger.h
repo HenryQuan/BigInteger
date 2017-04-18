@@ -17,6 +17,9 @@ BigInteger newInteger(char *number, int sign);
 // Print a BigInteger
 void printInteger(BigInteger number);
 
+// Calculate the sum of digits
+void calSumOfDigit(BigInteger number);
+
 // One + Two
 BigInteger add(BigInteger one, BigInteger two);
 
